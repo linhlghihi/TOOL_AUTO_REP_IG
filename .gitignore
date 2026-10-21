@@ -1,0 +1,8 @@
+node_modules/
+dist/
+.local/
+coverage/
+*.har
+instagram-dom.html
+*.log
+

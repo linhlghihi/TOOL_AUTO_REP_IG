@@ -1,0 +1,10 @@
+import {mkdir,writeFile} from 'node:fs/promises';
+import {resolve} from 'node:path';
+import {Agy} from '../src/bridge/agy';
+import {browseProducts} from '../src/bridge/browser-research';
+const dir=resolve('.local/web-smoke');await mkdir(dir,{recursive:true});
+const started=Date.now();
+const sources=await browseProducts('https://wrydeco.com/collections/all',['Find coffee tables. Use the Coffee Tables category filter on the all-products page, sort price low to high, then inspect one matching product and stop. Report the displayed currency; no conversion.'],new Agy(dir),'gemini-3.8-flash-low',AbortSignal.timeout(180000),console.log);
+await writeFile(resolve('.local/web-smoke-result.json'),JSON.stringify({seconds:(Date.now()-started)/1000,sources},null,2));
+console.log(JSON.stringify({seconds:(Date.now()-started)/1000,pages:sources.map(s=>({url:s.url,title:s.title,length:s.text.length}))},null,2));
+if(!sources.some(s=>s.url.includes('filter.'))||!sources.some(s=>s.url.includes('sort_by=price-ascending'))||!sources.some(s=>s.url.includes('/products/')))process.exitCode=1;

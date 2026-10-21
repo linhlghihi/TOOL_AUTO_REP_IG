@@ -1,0 +1,12 @@
+{
+ "manifest_version": 3, "name": "IG Shop Assistant", "version": "0.2.0", "minimum_chrome_version": "120",
+ "description": "Gợi ý trả lời Instagram và tìm sản phẩm bằng AGY trên máy. Bạn tự copy và gửi.",
+ "permissions": ["storage"],
+ "host_permissions": ["http://127.0.0.1:43127/*", "https://*/*"],
+ "background": { "service_worker": "background.js" },
+ "action": { "default_title": "Hiện/ẩn trợ lý IG" },
+ "content_scripts": [
+  { "matches": ["https://www.instagram.com/*"], "js": ["observer.js"], "run_at": "document_start", "world": "MAIN" },
+  { "matches": ["https://www.instagram.com/*"], "js": ["content.js"], "run_at": "document_idle" }
+ ]
+}

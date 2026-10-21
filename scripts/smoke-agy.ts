@@ -1,0 +1,15 @@
+import { mkdir,writeFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
+import { Store } from '../src/bridge/store';
+import { Engine,GenerateSchema } from '../src/bridge/engine';
+import { Agy } from '../src/bridge/agy';
+const dir=resolve('.local/smoke');await mkdir(dir,{recursive:true});
+const store=new Store(':memory:');store.saveSettings({...store.settings(),context:'DEMO SHOP: Cotton blanket queen size costs 49 USD. Available colors: blue and white. Do not offer discounts.'});
+const agy=new Agy(dir);const engine=new Engine(store,agy);
+const snapshot={account:'100',thread:'123456',customer:'Demo',confirmed:true,source:'network' as const,messages:[{id:'demo-customer',sender:'customer' as const,text:'How much is the queen cotton blanket?',timestamp:1,media:[]}]};
+const job=engine.start('test',snapshot,GenerateSchema.parse({snapshot}));
+while(job.status==='queued'||job.status==='running')await new Promise(r=>setTimeout(r,500));
+console.log(JSON.stringify({status:job.status,result:job.result,error:job.error},null,2));
+await writeFile(resolve('.local/smoke-result.json'),JSON.stringify({status:job.status,result:job.result,error:job.error},null,2));
+if(job.status!=='done'||!job.result?.reply.includes('49'))process.exitCode=1;
+store.close();

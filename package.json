@@ -1,0 +1,36 @@
+{
+  "name": "ig-shop-assistant",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "start": "node --experimental-sqlite dist/bridge/main.js",
+    "dev": "node --experimental-sqlite --import tsx src/bridge/main.ts",
+    "check": "tsc --noEmit",
+    "test": "node --experimental-sqlite --import tsx --test tests/*.test.ts",
+    "probe:agy": "node --experimental-sqlite --import tsx scripts/probe-agy.ts"
+  },
+  "dependencies": {
+    "cheerio": "^1.0.0",
+    "playwright": "^1.64.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "undici": "^6.21.0",
+    "zod": "^3.24.0"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.300",
+    "@types/jsdom": "^21.1.0",
+    "@types/node": "^22.10.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "esbuild": "^0.25.0",
+    "jsdom": "^26.0.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.0"
+  }
+}
