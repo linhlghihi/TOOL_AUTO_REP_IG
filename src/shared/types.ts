@@ -8,6 +8,7 @@ export const SettingsSchema = z.object({ model: z.string().regex(/^[a-zA-Z0-9._-
 export type Settings = z.infer<typeof SettingsSchema>;
 export const ResultSchema = z.object({
  language: z.string().max(100),
+ needsProductLinks:z.boolean().default(false),
  reply: z.string().max(16000), questions: z.array(z.string().max(2000)).max(10), needsWebsite: z.boolean(), searchTerms: z.array(z.string().max(200)).max(8), warnings: z.array(z.string().max(2000)).max(20)
 });
 export type AIResult = z.infer<typeof ResultSchema>;
@@ -18,6 +19,7 @@ export const resultJsonSchema = {
  type: 'object', additionalProperties: false,
  properties: {
   language: { type: 'string' },
+  needsProductLinks:{type:'boolean'},
   reply: { type: 'string' }, questions: { type: 'array', items: { type: 'string' } }, needsWebsite: { type: 'boolean' }, searchTerms: { type: 'array', items: { type: 'string' } }, warnings: { type: 'array', items: { type: 'string' } }
- }, required: ['language', 'reply', 'questions', 'needsWebsite', 'searchTerms', 'warnings']
+ }, required: ['language', 'needsProductLinks', 'reply', 'questions', 'needsWebsite', 'searchTerms', 'warnings']
 };

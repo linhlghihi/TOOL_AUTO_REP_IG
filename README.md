@@ -35,9 +35,9 @@ Tài liệu: [Cloudflare Quick Tunnels](https://developers.cloudflare.com/tunnel
 
 ## Dữ liệu và vận hành
 
-Khi cần tìm sản phẩm, bridge mở Chromium riêng, AGY đọc điều khiển thật trên trang rồi chọn danh mục, nhập từ khóa/giá, chọn bộ lọc, sắp xếp, chuyển trang và mở chi tiết sản phẩm. Chỉ dùng điều khiển website có sẵn; không tự tạo bộ lọc hay tự đổi tiền tệ. Tối đa 5 vòng điều hướng, 3 phút cho lượt duyệt. Tìm web có thể chậm hơn trả lời trực tiếp từ context. Nếu browser thất bại, thử đọc HTML công khai và báo hạn chế cho AI/chủ shop. Không đảm bảo duyệt toàn bộ danh mục.
+Từ bản 0.3, khi cần recommend sản phẩm, AI hỏi chủ shop chọn sản phẩm. Trong tab Đề xuất, dán tối đa 6 link HTTPS vào ô **Sản phẩm bạn chọn để giới thiệu**, mỗi dòng một link, rồi bấm **Đọc link & soạn tin nhắn**. Tool đọc song song các trang và tổng hợp thành một tin nhắn theo ngôn ngữ khách, có link sản phẩm. Có thể nhập link trước khi AI hỏi. Lựa chọn chỉ nằm trong cuộc trò chuyện đang mở, được xóa khi đổi khách và không lưu thành kiến thức chung của shop.
 
-Website dùng cho thử nghiệm: `https://wrydeco.com/collections/all`. Browser không dùng cookie/profile Instagram và chỉ cho đọc GET, chặn giỏ hàng, thanh toán và biểu mẫu gửi thông tin. Tài nguyên JS/CSS công khai có thể đến từ CDN; trang nội dung phải trong domain shop. START.cmd tự cài Chromium cần thiết lần đầu.
+Luồng recommend không tự tìm hoặc lọc sản phẩm nữa. Mỗi lần soạn từ link sẽ đọc lại giá; link lỗi khiến tool hỏi sửa/bỏ link, không tự đoán. Chỉ đọc trang HTML HTTPS công khai, chặn IP nội bộ, không dùng cookie IG và không chạy JavaScript trên trang sản phẩm. Link cần đăng nhập hoặc chỉ có nội dung sau JavaScript có thể cần bạn bổ sung thông tin. Giá/tiền tệ/biến thể được đưa vào nguồn để AI đối chiếu. Phần tra chính sách shop vẫn có thể đọc website cấu hình khi thiếu context. Mã browser cũ được giữ để kiểm thử, không được engine gọi trong luồng recommend mới.
 
 Bảng trợ lý nằm trong iframe bên trong Shadow DOM để tách sự kiện bàn phím khỏi Instagram, giữ hoạt động nhập tiếng Việt và React.
 

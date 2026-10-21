@@ -1,5 +1,12 @@
 # Kết quả kiểm tra — 21/10/2026
 
+## Bản 0.3 — chủ shop chọn link sản phẩm
+
+- Engine không gọi browser tự tìm/lọc sản phẩm trong luồng recommend. AI yêu cầu `needsProductLinks`; giao diện có ô nhập tối đa 6 link và nút đọc/tổng hợp.
+- 22 tests qua, gồm link sai/ngoài giao thức/IP nội bộ, giữ metadata giá/tiền tệ, hỏi chủ shop trước khi recommend, đọc các link trước một lần tổng hợp, không lưu lựa chọn thành shop facts, không dùng reply cache cũ cho giá sản phẩm, chặn bản nháp nếu một link lỗi.
+- TypeScript và build qua. Test focus iframe vẫn qua; chưa thử bản 0.3 trực tiếp trên tài khoản IG người dùng.
+- AGY thật `gemini-3.8-flash-low`: lần đầu hỏi chủ shop chọn sản phẩm, lần tiếp theo đọc hai link Wrydeco công khai và tổng hợp một bản nháp chứa đủ hai link. Kết quả tại `.local/products-smoke-result.json`; không dùng hội thoại khách thật.
+
 ## Bản 0.2 — chỉ soạn câu trả lời, lọc sản phẩm, tách focus
 
 - TypeScript/build và 17 tests qua: thêm schema không còn dịch, không gọi AI khi tin cuối là của shop, kiểm tra input React trong iframe trước handler trang cha cố giành focus, thao tác lọc/sắp xếp/phân trang trên fixture và kiểm tra token khi đổi server.

@@ -8,7 +8,7 @@ import { parseEnvelope } from '../src/bridge/agy';
 import { publicAddress,allowedMedia,websiteScope,publicFetch } from '../src/bridge/network';
 import { type AIResult,type Snapshot } from '../src/shared/types';
 const snapshot=(thread='123456'):Snapshot=>({account:'100',thread,customer:'Test',source:'network',confirmed:true,messages:[{id:'m1',sender:'customer',text:'What sizes?',timestamp:1,media:[]}]});
-const result=():AIResult=>({language:'English',reply:'We have S and M.',questions:[],needsWebsite:false,searchTerms:[],warnings:[]});
+const result=():AIResult=>({needsProductLinks:false,language:'English',reply:'We have S and M.',questions:[],needsWebsite:false,searchTerms:[],warnings:[]});
 const options=(s:Snapshot)=>GenerateSchema.parse({snapshot:s});
 async function done(engine:Engine,id:string){for(let i=0;i<200;i++){const job=engine.jobs.get(id)!;if(['done','error','cancelled'].includes(job.status))return job;await new Promise(r=>setTimeout(r,5));}throw new Error('Test job timed out');}
 test('network IDs distinguish IG ID from sender FBID and preserve repeated messages',()=>{

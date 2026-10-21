@@ -169,7 +169,8 @@ Không cần kết nối CDP hoặc bật automation API của Multilogin. Nếu
 3. Mở **Cài đặt**, nhập website shop HTTPS và kiến thức shop: sản phẩm, giá/tiền tệ, size, vận chuyển, đổi trả, giọng tư vấn. Có thể nạp `.txt`, `.md`, `.csv`.
 4. Chọn model có trong danh sách AGY trên máy rồi **Lưu cài đặt**. Không mặc định mọi tài khoản có cùng model; nếu model mặc định không tồn tại, chọn một model được liệt kê.
 5. Mở một cuộc trò chuyện, đối chiếu người gửi và nội dung trước khi dùng đề xuất. Nếu chưa xác định được người gửi, tải lại hoặc xác nhận Bạn/Khách trong bảng.
-6. Đọc bản nháp → **Copy** → tự dán và gửi. Tool không gửi hộ.
+6. Nếu khách cần recommend sản phẩm, AI hỏi bạn muốn giới thiệu sản phẩm nào. Dán tối đa 6 link HTTPS, mỗi dòng một link vào ô **Sản phẩm bạn chọn để giới thiệu**, rồi bấm **Đọc link & soạn tin nhắn**. AI đọc các trang và tổng hợp thành một câu trả lời. Link đã chọn được xóa khi chuyển khách, không tự lưu vào kiến thức chung.
+7. Đọc bản nháp → **Copy** → tự dán và gửi. Tool không gửi hộ.
 
 Nếu người nhận cũng vận hành Wrydeco, URL danh mục đã được thử là `https://wrydeco.com/collections/all`. Với shop khác, dùng website của người nhận; không sao chép kiến thức, giá hoặc tài khoản của người gửi.
 
@@ -209,7 +210,7 @@ Khi nhận bản tool mới: dừng START/bridge cũ, giữ nguyên `.local` c�
 | Danh sách model có nhưng soạn lỗi | Kiểm tra quyền dùng model/quota bằng một yêu cầu tổng hợp nếu người dùng muốn; `agy models` không chứng minh inference thành công. |
 | Không thấy bảng trợ lý | Đúng profile chưa, extension đã bật chưa, tab có phải `www.instagram.com` không; tải lại tab và bấm biểu tượng extension. |
 | Gõ chữ vẫn mất focus | Kiểm tra đã Reload bản extension mới và tải lại IG, không chỉ restart bridge. |
-| Tìm web lâu hoặc thiếu kết quả | Browser chỉ dùng bộ lọc có thật, tối đa 5 vòng/3 phút; tiền tệ, CAPTCHA, đăng nhập hoặc API POST có thể hạn chế. Bổ sung context khi tool hỏi. |
+| Link sản phẩm không đọc được | Kiểm tra link công khai HTTPS, không phải giỏ hàng/đăng nhập; sửa hoặc bỏ link lỗi. Trang chỉ hiện nội dung bằng JavaScript có thể cần bổ sung thông tin bằng chữ. Bản 0.3 không tự tìm/lọc sản phẩm: chủ shop chọn link. |
 
 ## Dành cho người gửi bộ tool
 

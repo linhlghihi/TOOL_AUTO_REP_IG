@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { CHANNEL,routeThread,readDom,fingerprint,calibrateDom } from './extract';
 import { SnapshotSchema,type Snapshot,type AIResult,type Settings,type Job } from '../shared/types';
 import {LOCAL_SERVER,serverUrl} from '../shared/server';
+import {normalizeProductLinks} from '../shared/product-links';
 const snapshots=new Map<string,Snapshot>();
 const listeners=new Set<()=>void>();
 window.addEventListener('message',e=>{
@@ -46,6 +47,7 @@ function App(){
  const [settingsRevision,setSettingsRevision]=useState(0);
  const [result,setResult]=useState<AIResult|null>(null),[sources,setSources]=useState<any[]>([]),[draft,setDraft]=useState(''),[dirty,setDirty]=useState(false),[resultKey,setResultKey]=useState('');
  const [instruction,setInstruction]=useState(''),[answer,setAnswer]=useState(''),[mediaNotes,setMediaNotes]=useState<Record<string,string>>({}),[manualSenders,setManualSenders]=useState<Record<string,'self'|'customer'>>({});
+ const [productLinksText,setProductLinksText]=useState('');
  const [manualAccount,setManualAccount]=useState(''),[manualConfirmed,setManualConfirmed]=useState('');
  const epoch=useRef(0),current=useRef<Snapshot|null>(null),lastThread=useRef(''),lastObserved=useRef(''),running=useRef(false);
  const key=snapshot?fingerprint(snapshot):'';
@@ -59,7 +61,7 @@ function App(){
   const read=()=>{
    const s=activeSnapshot(),fp=s?fingerprint(s):'';if(fp===lastObserved.current)return;lastObserved.current=fp;
    const thread=s?`${s.account}:${s.thread}`:'';
-   if(thread!==lastThread.current){lastThread.current=thread;setResult(null);setSources([]);setDraft('');setDirty(false);setResultKey('');setAnswer('');setInstruction('');setMediaNotes({});setManualSenders({});setManualConfirmed('');}
+   if(thread!==lastThread.current){lastThread.current=thread;setResult(null);setSources([]);setDraft('');setDirty(false);setResultKey('');setAnswer('');setInstruction('');setProductLinksText('');setMediaNotes({});setManualSenders({});setManualConfirmed('');}
    epoch.current++;running.current=false;void api('/cancel','POST').catch(()=>{});current.current=s;setSnapshot(s);setStatus(s?'Đã nhận cuộc trò chuyện':'Mở một cuộc trò chuyện Instagram');
   };
   let timer:ReturnType<typeof setTimeout>|undefined;
@@ -72,7 +74,8 @@ function App(){
   const s=effectiveRef.current;if(!s?.confirmed||!connected)return;
   const mine=++epoch.current,fp=current.current?fingerprint(current.current):'';running.current=true;setError('');setStatus('Đang gửi yêu cầu…');
   try{
-   const {id}=await api('/generate','POST',{snapshot:s,instruction,force,mediaNotes,answer:ownerAnswer});
+   const productLinks=normalizeProductLinks(productLinksText.split(/\r?\n/).map(x=>x.trim()).filter(Boolean));
+   const {id}=await api('/generate','POST',{snapshot:s,instruction,force,mediaNotes,answer:ownerAnswer,productLinks});
    while(mine===epoch.current){
     const job:Job=await api(`/jobs/${id}`);if(mine!==epoch.current)return;
     setStatus(job.phase);
@@ -115,7 +118,8 @@ function App(){
    </>}
    {tab==='reply'&&<>
     {dirty&&resultKey!==key&&<div className="warning">Có tin mới. Bản bạn đang sửa được giữ lại; hãy soạn lại trước khi copy.</div>}
-    {!!result?.questions.length&&<div className="card"><h3>Cần bạn bổ sung</h3>{result.questions.map((q,i)=><p key={i}>{i+1}. {q}</p>)}<textarea placeholder="Trả lời bằng tiếng Việt…" value={answer} onChange={e=>setAnswer(e.target.value)}/><small>Thông tin chung được tự ghi nhớ cho shop. Chi tiết riêng giữ theo khách.</small><button className="primary" disabled={!answer.trim()||!effective?.confirmed} onClick={()=>void generate(true,{question:result.questions.join('\n'),answer})}>Bổ sung & soạn lại</button></div>}
+    <div className="card"><h3>{result?.needsProductLinks?'Bạn muốn giới thiệu sản phẩm nào?':'Sản phẩm bạn chọn để giới thiệu'}</h3>{result?.needsProductLinks&&result.questions.map((q,i)=><p key={i}>{q}</p>)}<textarea aria-label="Link sản phẩm" placeholder="Dán link HTTPS, mỗi dòng một link (tối đa 6)…" value={productLinksText} onChange={e=>{setProductLinksText(e.target.value);setResultKey('');setDirty(true);epoch.current++;running.current=false;void api('/cancel','POST').catch(()=>{});}}/><small>AI đọc các link này và tổng hợp thành một tin nhắn. Lựa chọn chỉ dùng cho cuộc trò chuyện hiện tại, không lưu thành kiến thức chung của shop.</small><button className="primary" style={{marginTop:10}} disabled={!productLinksText.trim()||!connected||!effective?.confirmed||!settings?.context.trim()} onClick={()=>void generate(true)}>Đọc link & soạn tin nhắn</button></div>
+    {!!result?.questions.length&&!result.needsProductLinks&&<div className="card"><h3>Cần bạn bổ sung</h3>{result.questions.map((q,i)=><p key={i}>{i+1}. {q}</p>)}<textarea placeholder="Trả lời bằng tiếng Việt…" value={answer} onChange={e=>setAnswer(e.target.value)}/><small>Thông tin chung được tự ghi nhớ cho shop. Chi tiết riêng giữ theo khách.</small><button className="primary" disabled={!answer.trim()||!effective?.confirmed} onClick={()=>void generate(true,{question:result.questions.join('\n'),answer})}>Bổ sung & soạn lại</button></div>}
     <div className="card"><div className="row between"><h3>Câu trả lời đề xuất</h3><span className="badge">{result?.language||'Theo ngôn ngữ khách'}</span></div><textarea className="draft" placeholder="Đề xuất sẽ xuất hiện ở đây…" value={draft} onChange={e=>{setDraft(e.target.value);setDirty(true);}}/><div className="row between" style={{marginTop:10}}><small>{dirty?'Bạn đã chỉnh sửa đề xuất':'Bạn tự dán và gửi trên Instagram'}</small><button className="primary" disabled={!draft.trim()||resultKey!==key||!!result?.questions.length} onClick={()=>{void navigator.clipboard.writeText(draft).then(()=>setStatus('Đã copy — bạn tự dán và gửi')).catch(err);}}>Copy</button></div></div>
     <div className="card"><label>Hướng dẫn thêm cho AI</label><textarea value={instruction} onChange={e=>setInstruction(e.target.value)} placeholder="Ví dụ: hỏi khách muốn kích thước nào, trả lời ngắn thôi…"/><button style={{marginTop:10}} disabled={!connected||!effective?.confirmed||!settings?.context.trim()} onClick={()=>void generate(true)}>↻ Soạn lại</button></div>
     {result?.warnings.map((w,i)=><div className="warning" key={i}>{w}</div>)}
